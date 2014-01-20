@@ -28,6 +28,10 @@ public class YinxiangUploader extends Uploader {
     private NoteStoreClient noteStore;
     private Notebook wordbook;
 
+    /**
+     * It's a synchronized method and does networking. So it's better to call it in a new method.
+     * @param listener
+     */
     public YinxiangUploader(UploaderListener listener) {
         super(listener);
 
@@ -71,45 +75,56 @@ public class YinxiangUploader extends Uploader {
         getListener().onStateUpdated("Uploader ready.");
     }
 
+    /**
+     * This is an asynchronized method, which does all work in a new thread, and return a task ID immediately after the invocation.
+     * When the upload procedure succeeds, it will notify the caller from the listener, which registered in constructor.
+     * @param msg word and sentence bundle
+     * @return task ID
+     */
     @Override
-    public int upload(UploadMessage msg) {
-        getListener().onStateUpdated("Start uploading word " + msg.getWord());
+    public int upload(final UploadMessage msg) {
+        new Thread() {
+            @Override
+            public void run() {
+                getListener().onStateUpdated("Start uploading word " + msg.getWord());
 
-        NoteFilter noteFilter = new NoteFilter();
-        noteFilter.setNotebookGuid(wordbook.getGuid());
+                NoteFilter noteFilter = new NoteFilter();
+                noteFilter.setNotebookGuid(wordbook.getGuid());
 
-        try {
-            getListener().onStateUpdated("Searching word record.");
-            NoteList notes = noteStore.findNotes(noteFilter, 0, 1);
-            if(notes.getNotesSize() != 0) {
-                getListener().onStateUpdated("Try to fetch note content.");
-                Note note = notes.getNotes().get(0);
-                note.setContent(noteStore.getNoteContent(note.getGuid()));
-                getListener().onStateUpdated("Try to update note.");
-                updateNote(msg, note);
-                getListener().onStateUpdated("Complete updating note.");
+                try {
+                    getListener().onStateUpdated("Searching word record.");
+                    NoteList notes = noteStore.findNotes(noteFilter, 0, 1);
+                    if(notes.getNotesSize() != 0) {
+                        getListener().onStateUpdated("Try to fetch note content.");
+                        Note note = notes.getNotes().get(0);
+                        note.setContent(noteStore.getNoteContent(note.getGuid()));
+                        getListener().onStateUpdated("Try to update note.");
+                        updateNote(msg, note);
+                        getListener().onStateUpdated("Complete updating note.");
+                    }
+                    else {
+                        getListener().onStateUpdated("Try to create note.");
+                        List<String> egSentences = new ArrayList<String>();
+                        egSentences.add(msg.getEgSentence());
+                        EvernoteWordRecord record = new EvernoteWordRecord(msg.getWord(), egSentences);
+                        Note note = new Note();
+                        note.setNotebookGuid(wordbook.getGuid());
+                        note.setTitle(msg.getWord());
+                        note.setContent(record.getNoteContent());
+                        noteStore.createNote(note);
+                        getListener().onStateUpdated("Complete creating note.");
+                    }
+                } catch (EDAMUserException e) {
+                    e.printStackTrace();
+                } catch (EDAMSystemException e) {
+                    e.printStackTrace();
+                } catch (EDAMNotFoundException e) {
+                    e.printStackTrace();
+                } catch (TException e) {
+                    e.printStackTrace();
+                }
             }
-            else {
-                getListener().onStateUpdated("Try to create note.");
-                List<String> egSentences = new ArrayList<String>();
-                egSentences.add(msg.getEgSentence());
-                EvernoteWordRecord record = new EvernoteWordRecord(msg.getWord(), egSentences);
-                Note note = new Note();
-                note.setNotebookGuid(wordbook.getGuid());
-                note.setTitle(msg.getWord());
-                note.setContent(record.getNoteContent());
-                noteStore.createNote(note);
-                getListener().onStateUpdated("Complete creating note.");
-            }
-        } catch (EDAMUserException e) {
-            e.printStackTrace();
-        } catch (EDAMSystemException e) {
-            e.printStackTrace();
-        } catch (EDAMNotFoundException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-        }
+        }.start();
 
         return getAccumulatedTaskId();
     }
