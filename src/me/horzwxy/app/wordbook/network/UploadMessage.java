@@ -13,6 +13,14 @@ public class UploadMessage {
         this.egSentence = egSentence;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public String getEgSentence() {
+        return egSentence;
+    }
+
     @Override
     public String toString() {
         return word + ": " + egSentence;

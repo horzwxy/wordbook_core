@@ -12,4 +12,10 @@ public interface UploaderListener {
      * @param msg The message uploaded or intent to be uploaded
      */
     public void onUploaded(int taskId, boolean succeeded, UploadMessage msg);
+
+    /**
+     * Notify the caller about the current state of updating.
+     * @param currentState string representation of current updating state
+     */
+    public void onStateUpdated(String currentState);
 }

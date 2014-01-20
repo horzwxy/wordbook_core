@@ -12,6 +12,10 @@ public abstract class Uploader {
         this.listener = listener;
     }
 
+    protected UploaderListener getListener() {
+        return listener;
+    }
+
     /**
      * Upload the message to remote server.
      * It does all synchronization work. So it can be call at the same moment among multiple threads.
