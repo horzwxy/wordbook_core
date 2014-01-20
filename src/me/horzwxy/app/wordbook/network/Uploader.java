@@ -1,34 +1,35 @@
 package me.horzwxy.app.wordbook.network;
 
+import me.horzwxy.app.wordbook.model.Word;
+import me.horzwxy.app.wordbook.model.WordState;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * Interface of general uploader.
  */
 public abstract class Uploader {
 
-    private int accumulatedTaskId = 0;
-    private UploaderListener listener;
-
-    protected Uploader(UploaderListener listener) {
-        this.listener = listener;
-    }
-
-    protected UploaderListener getListener() {
-        return listener;
-    }
+    protected Uploader() {}
 
     /**
      * Upload the message to remote server.
-     * It does all synchronization work. So it can be call at the same moment among multiple threads.
-     * Uploading procedure is <em>asynchronized</em>, indicating the call can get task ID immediately after the invocation, and wait for the callback in the listener.
-     * @return task ID
+     * Uploading procedure is <em>synchronized</em>, indicating the caller should branch a new thread waiting for the method to return.
+     * @return true if the upload succeeded
      */
-    public abstract int upload(UploadMessage msg);
+    public abstract boolean upload(UploadMessage msg, WordState state);
+
+    public abstract boolean remove(String word, WordState state);
+
+    public abstract Map<String, Word> getBaseWords();
+
+    public abstract Map<String, Word> getIgnoredWords();
 
     /**
-     * Get an available task ID and increase it by additional one.
-     * @return available task ID
+     * Update the ignored words list.
+     * @param msg word bundle ignored
+     * @return true if the updating procedure is successful
      */
-    protected synchronized int getAccumulatedTaskId() {
-        return accumulatedTaskId++;
-    }
+    public abstract boolean uploadIgnore(UploadMessage msg);
 }
