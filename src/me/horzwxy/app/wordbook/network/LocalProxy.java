@@ -1,5 +1,6 @@
 package me.horzwxy.app.wordbook.network;
 
+import me.horzwxy.app.wordbook.analyzer.WordLibrary;
 import me.horzwxy.app.wordbook.model.Word;
 import me.horzwxy.app.wordbook.model.WordState;
 
@@ -73,6 +74,11 @@ public class LocalProxy extends Proxy {
 
     @Override
     public void updateUnrecognizedWords(Map<String, Word> unrecognizedWords) {
+
+    }
+
+    @Override
+    public void updateWords(WordLibrary library) {
 
     }
 }

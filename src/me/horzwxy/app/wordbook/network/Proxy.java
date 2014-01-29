@@ -1,5 +1,6 @@
 package me.horzwxy.app.wordbook.network;
 
+import me.horzwxy.app.wordbook.analyzer.WordLibrary;
 import me.horzwxy.app.wordbook.model.Word;
 import me.horzwxy.app.wordbook.model.WordState;
 
@@ -32,4 +33,6 @@ public abstract class Proxy {
     public abstract void updateUnfamiliarWords(Map<String, Word> unfamiliarWords);
 
     public abstract void updateUnrecognizedWords(Map<String, Word> unrecognizedWords);
+
+    public abstract void updateWords(WordLibrary library);
 }

@@ -11,6 +11,7 @@ import com.evernote.edam.error.EDAMUserException;
 import com.evernote.edam.notestore.NoteFilter;
 import com.evernote.edam.type.*;
 import com.evernote.thrift.TException;
+import me.horzwxy.app.wordbook.analyzer.WordLibrary;
 import me.horzwxy.app.wordbook.model.NoteManipulator;
 import me.horzwxy.app.wordbook.model.Word;
 import me.horzwxy.app.wordbook.model.WordState;
@@ -144,5 +145,32 @@ public class YinxiangProxy extends Proxy {
         } catch (TException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void updateWords(WordLibrary library) {
+        Map<String, Word> familiarWords = new HashMap<String, Word>();
+        for(Word word : library.getWords(WordState.FAMILIAR)) {
+            familiarWords.put(word.getContent(), word);
+        }
+        updateFamiliarWords(familiarWords);
+
+        Map<String, Word> unfamiliarWords = new HashMap<String, Word>();
+        for(Word word : library.getWords(WordState.UNFAMILIAR)) {
+            unfamiliarWords.put(word.getContent(), word);
+        }
+        updateUnfamiliarWords(unfamiliarWords);
+
+        Map<String, Word> unrecognizedWords = new HashMap<String, Word>();
+        for(Word word : library.getWords(WordState.UNRECOGNIZED)) {
+            unrecognizedWords.put(word.getContent(), word);
+        }
+        updateUnrecognizedWords(unrecognizedWords);
+
+        Map<String, Word> ignoredWords = new HashMap<String, Word>();
+        for(Word word : library.getWords(WordState.IGNORED)) {
+            ignoredWords.put(word.getContent(), word);
+        }
+        updateIgnoredWords(ignoredWords);
     }
 }
