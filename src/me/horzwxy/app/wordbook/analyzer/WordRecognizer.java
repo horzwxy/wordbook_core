@@ -154,7 +154,7 @@ public class WordRecognizer {
 				result.add( word.substring( 0, word.length() - 3 ) + "e" );	// no -ing and add an 'e'
 				
 				// if the last letter was doubled
-				if( word.charAt( word.length() - 4 ) == word.charAt( word.length() - 5 ) ) {
+				if( word.length() > 4 && word.charAt( word.length() - 4 ) == word.charAt( word.length() - 5 ) ) {
 					result.add( word.substring( 0, word.length() - 4 ) );	// no double letter
 				}
 			}
