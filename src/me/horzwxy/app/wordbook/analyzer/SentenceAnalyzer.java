@@ -53,9 +53,11 @@ public class SentenceAnalyzer {
             }
             else if( state == WordState.UNTRACKED) {
                 wordInstance = new Word(pw, WordState.UNTRACKED);
+                wordLibrary.addWord(wordInstance, WordState.UNTRACKED);
             }
 
             assert wordInstance != null;
+            wordInstance.addSentence(sentence);
             AnalyzeResult result = new AnalyzeResult(
                     wordInstance,
                     WordRecognizer.findPossibleForms(wordInstance.getContent()),

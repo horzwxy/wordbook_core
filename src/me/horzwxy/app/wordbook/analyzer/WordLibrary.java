@@ -16,6 +16,22 @@ public class WordLibrary {
     private Map<String, Word> library;
     private Map<WordState, Collection<Word>> stateTable;
 
+    public void printRecords() {
+        for(WordState state : WordState.values()) {
+            if(state.equals(WordState.BASIC)) {
+                continue;
+            }
+            System.out.println("state:" + state.name());
+            Collection<Word> words = stateTable.get(state);
+            for(Word word : words) {
+                System.out.println("content:" + word.getContent());
+                for(String sentence : word.getSentences()) {
+                    System.out.println("sentence:" + sentence);
+                }
+            }
+        }
+    }
+
     public WordLibrary() {
         this.library = new HashMap<String, Word>();
         this.stateTable = new HashMap<WordState, Collection<Word>>();
@@ -62,5 +78,12 @@ public class WordLibrary {
             library.put(word.getContent().toLowerCase(), word);
         }
         stateTable.get(state).addAll(words);
+    }
+
+    public void updateWord(Word word, WordState originalState) {
+        if(!word.getState().equals(originalState)) {
+            stateTable.get(originalState).remove(word);
+            stateTable.get(word.getState()).add(word);
+        }
     }
 }
