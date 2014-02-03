@@ -31,7 +31,11 @@ public class NoteManipulator {
         for(Word word : wordList) {
             result += "<p><em>" + word.getContent() + "</em>";
             for(String sentence : word.getSentences()) {
-                result += "<span>" + sentence + "</span>";
+                if(word.getState() != WordState.BASIC
+                        && word.getState() != WordState.IGNORED
+                        && word.getState() != WordState.FAMILIAR) {
+                    result += "<span>" + sentence + "</span>";
+                }
             }
             result += "</p>";
         }

@@ -57,7 +57,9 @@ public class SentenceAnalyzer {
             }
 
             assert wordInstance != null;
-            wordInstance.addSentence(sentence);
+            if(!wordInstance.getSentences().contains(sentence)) {
+                wordInstance.addSentence(sentence);
+            }
             AnalyzeResult result = new AnalyzeResult(
                     wordInstance,
                     WordRecognizer.findPossibleForms(wordInstance.getContent()),
