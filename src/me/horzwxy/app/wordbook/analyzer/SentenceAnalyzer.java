@@ -40,6 +40,7 @@ public class SentenceAnalyzer {
             }
 
             WordState state = recognizer.analyze( pw );
+            List<String> possibleforms = WordRecognizer.findPossibleForms(pw);
 
             if(state.ordinal() <= WordState.FAMILIAR.ordinal()) {
                 continue;
@@ -48,7 +49,7 @@ public class SentenceAnalyzer {
             Word wordInstance = null;
             if( state == WordState.UNFAMILIAR ||
                     state == WordState.UNRECOGNIZED) {
-                wordInstance = wordLibrary.getWord( pw );
+                wordInstance = wordLibrary.getWord( possibleforms );
 
             }
             else if( state == WordState.UNTRACKED) {
@@ -62,7 +63,7 @@ public class SentenceAnalyzer {
             }
             AnalyzeResult result = new AnalyzeResult(
                     wordInstance,
-                    WordRecognizer.findPossibleForms(wordInstance.getContent()),
+                    possibleforms,
                     sentence
             );
             resultList.add(result);

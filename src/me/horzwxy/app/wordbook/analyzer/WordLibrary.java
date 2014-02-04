@@ -64,6 +64,16 @@ public class WordLibrary {
         return library.get( word );
 	}
 
+    public Word getWord(List<String> possibleForms) {
+        for(String form : possibleForms) {
+            if(library.containsKey(form)) {
+                return library.get(form);
+            }
+        }
+
+        return null;
+    }
+
     public Collection<Word> getWords(WordState state) {
         return stateTable.get(state);
     }
@@ -80,7 +90,13 @@ public class WordLibrary {
         stateTable.get(state).addAll(words);
     }
 
-    public void updateWord(Word word, WordState originalState) {
+    public void updateWordContent(Word word, String newContent) {
+        library.remove(word.getContent().toLowerCase());
+        word.setContent(newContent);
+        library.put(newContent, word);
+    }
+
+    public void updateWordState(Word word, WordState originalState) {
         if(!word.getState().equals(originalState)) {
             stateTable.get(originalState).remove(word);
             stateTable.get(word.getState()).add(word);
