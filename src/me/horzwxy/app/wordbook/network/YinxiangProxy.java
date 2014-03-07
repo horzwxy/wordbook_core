@@ -16,6 +16,9 @@ import me.horzwxy.app.wordbook.model.NoteManipulator;
 import me.horzwxy.app.wordbook.model.Word;
 import me.horzwxy.app.wordbook.model.WordState;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,7 @@ public class YinxiangProxy extends Proxy {
 
     private NoteStoreClient noteStore;
     private Map<WordState, Note> noteMap;
+    private Notebook markedArticleNotebook;
 
     /**
      * It's a synchronized method in which does networking. So it's better to call it in a new method.
@@ -60,6 +64,10 @@ public class YinxiangProxy extends Proxy {
             noteStore = factory.createNoteStoreClient();
             List<Notebook> notebooks = noteStore.listNotebooks();
             for (Notebook notebook : notebooks) {
+                if(notebook.getName().equals("markedArticle")) {
+                    markedArticleNotebook = notebook;
+                    continue;
+                }
                 if (notebook.getName().equals("wordbook")) {
                     NoteFilter noteFilter = new NoteFilter();
                     noteFilter.setNotebookGuid(notebook.getGuid());
@@ -172,5 +180,26 @@ public class YinxiangProxy extends Proxy {
             ignoredWords.put(word.getContent(), word);
         }
         updateIgnoredWords(ignoredWords);
+    }
+
+    public boolean uploadMarkedArticle(String noteContent) {
+        Note note = new Note();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        note.setTitle(formatter.format(new Date()));
+        note.setContent(noteContent);
+        note.setNotebookGuid(markedArticleNotebook.getGuid());
+        try {
+            noteStore.createNote(note);
+            return true;
+        } catch (EDAMUserException e) {
+            e.printStackTrace();
+        } catch (EDAMSystemException e) {
+            e.printStackTrace();
+        } catch (EDAMNotFoundException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
